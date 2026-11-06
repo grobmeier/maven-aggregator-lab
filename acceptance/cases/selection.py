@@ -1,0 +1,75 @@
+# SPDX-License-Identifier: Apache-2.0
+"""Case definitions for selection."""
+
+from model import Case
+
+
+CASES = [
+    Case(
+        'partial-root-expansion',
+        selection='.,a',
+        purpose='Observe Maven 4 expansion of selected root projects to their children.',
+        group='selection',
+        requirement_policy='observation',
+        requirement='Observe how selecting the root expands the selected reactor. This is a selection diagnostic.',
+        order=12,
+        observation='OBSERVED SELECTION: selecting the root expanded the active reactor to both children.',
+    ),
+    Case(
+        'partial-fixed',
+        selection='.,a,!b',
+        contributors='a,b',
+        expectation='missing-b',
+        purpose='Keep a fixed contributor list while selecting only root and a.',
+        group='selection',
+        requirement_policy='ordered',
+        requirement='Identify and aggregate the intended active contributors without a manually maintained dependency list.',
+        active_contributors=('a',),
+        comparisons=(('partial-selected', 'Contributor policy only'),),
+        order=13,
+    ),
+    Case(
+        'partial-selected',
+        selection='.,a,!b',
+        purpose='Change only contributor selection from partial-fixed. Collect selected leaves.',
+        group='selection',
+        requirement_policy='ordered',
+        requirement='Identify and aggregate the intended active contributors without a manually maintained dependency list.',
+        active_contributors=('a',),
+        comparisons=(('partial-no-root', 'Project selection only'),),
+        order=14,
+    ),
+    Case(
+        'partial-no-root',
+        selection='a',
+        expectation='no-root',
+        purpose='Exclude the root. Check whether root bindings still provide session hooks.',
+        group='selection',
+        requirement_policy='ordered',
+        requirement='Provide one session start and end even when the selected reactor excludes the root.',
+        active_contributors=('a',),
+        order=15,
+    ),
+    Case(
+        'nested-group',
+        nested=True,
+        contributors='group',
+        purpose='Run hooks at group, collect group/a and group/b, and exclude the outside sibling.',
+        group='selection',
+        requirement_policy='ordered',
+        requirement='Run hooks once at the selected group and collect only its active leaf contributors.',
+        comparisons=(('nested-selected', 'Project selection only'),),
+        order=16,
+    ),
+    Case(
+        'nested-selected',
+        nested=True,
+        contributors='group',
+        selection='group,group/a,!group/b',
+        purpose='Keep the group boundary while selecting only group/a as contributor.',
+        group='selection',
+        requirement_policy='ordered',
+        requirement='Run hooks once at the selected group and collect only its active leaf contributors.',
+        order=17,
+    ),
+]
