@@ -1,0 +1,986 @@
+[
+  {
+    "definition": {
+      "name": "seq-package",
+      "builder": "singlethreaded",
+      "threads": 1,
+      "phase": "package",
+      "single": false,
+      "failure": "",
+      "selection": "",
+      "contributors": "selected",
+      "lifecycle": "package",
+      "expectation": "early",
+      "nested": false,
+      "inheritance": "",
+      "purpose": "Observe root package aggregation before child contributions."
+    },
+    "metadata": {
+      "case": "seq-package",
+      "purpose": "Observe root package aggregation before child contributions.",
+      "builder": "singlethreaded",
+      "threads": 1,
+      "start_binding": "before:all",
+      "end_binding": "package",
+      "lifecycle": "package",
+      "selection": "",
+      "single_project": false,
+      "nested_group": false,
+      "contributor_policy": "selected",
+      "expectation": "early",
+      "intended_requirement": "Observe package-bound timing without assigning a reactor-wide barrier to the ordinary package phase.",
+      "expected_diagnostic": "Reproduce the exact missing-contribution failure before child output exists."
+    },
+    "contract": "aggregation-fixture-v1:3f2359858fe737fd1ffb68301829c2dcbbeadab20008f896f492fc6f2a7bf806",
+    "inputs": {
+      "a/pom.xml": "3edd0bed56ce5f7532bc8254d1ec36e451a1683c663d5b84ba4f2671febef295",
+      "b/pom.xml": "6a6ad8675628bdc02477fdf5bca9290a8e0e17e920778ec148f9415ecf505bef",
+      "pom.xml": "90b40799cf1f3f8b515a84b6081f1bcdb5141811102ff04b7f65759d680e4fb7"
+    }
+  },
+  {
+    "definition": {
+      "name": "concurrent-package",
+      "builder": "concurrent",
+      "threads": 1,
+      "phase": "package",
+      "single": false,
+      "failure": "",
+      "selection": "",
+      "contributors": "selected",
+      "lifecycle": "package",
+      "expectation": "timing-diagnostic",
+      "nested": false,
+      "inheritance": "",
+      "purpose": "Change only the builder from seq-package. Check actual timing."
+    },
+    "metadata": {
+      "case": "concurrent-package",
+      "purpose": "Change only the builder from seq-package. Check actual timing.",
+      "builder": "concurrent",
+      "threads": 1,
+      "start_binding": "before:all",
+      "end_binding": "package",
+      "lifecycle": "package",
+      "selection": "",
+      "single_project": false,
+      "nested_group": false,
+      "contributor_policy": "selected",
+      "expectation": "timing-diagnostic",
+      "intended_requirement": "Observe package-bound timing without assigning a reactor-wide barrier to the ordinary package phase.",
+      "expected_diagnostic": "Check either an ordered successful trace or an exact early-output diagnostic. No barrier claim."
+    },
+    "contract": "aggregation-fixture-v1:64932dbf5ed67a4be97a8dd9cf79e734276531796612fe76e763e10d23528f21",
+    "inputs": {
+      "a/pom.xml": "3edd0bed56ce5f7532bc8254d1ec36e451a1683c663d5b84ba4f2671febef295",
+      "b/pom.xml": "6a6ad8675628bdc02477fdf5bca9290a8e0e17e920778ec148f9415ecf505bef",
+      "pom.xml": "90b40799cf1f3f8b515a84b6081f1bcdb5141811102ff04b7f65759d680e4fb7"
+    }
+  },
+  {
+    "definition": {
+      "name": "seq-after-all",
+      "builder": "singlethreaded",
+      "threads": 1,
+      "phase": "after:all",
+      "single": false,
+      "failure": "",
+      "selection": "",
+      "contributors": "selected",
+      "lifecycle": "package",
+      "expectation": "early",
+      "nested": false,
+      "inheritance": "",
+      "purpose": "Change only the binding from seq-package. Check the missing child barrier."
+    },
+    "metadata": {
+      "case": "seq-after-all",
+      "purpose": "Change only the binding from seq-package. Check the missing child barrier.",
+      "builder": "singlethreaded",
+      "threads": 1,
+      "start_binding": "before:all",
+      "end_binding": "after:all",
+      "lifecycle": "package",
+      "selection": "",
+      "single_project": false,
+      "nested_group": false,
+      "contributor_policy": "selected",
+      "expectation": "early",
+      "intended_requirement": "Run one start before the intended contributors and one successful end after them.",
+      "expected_diagnostic": "Reproduce the exact missing-contribution failure before child output exists."
+    },
+    "contract": "aggregation-fixture-v1:d0e3a0b679c89f65d20288a839df1309687b1ea4bdd6f31f41f83c565520678a",
+    "inputs": {
+      "a/pom.xml": "3edd0bed56ce5f7532bc8254d1ec36e451a1683c663d5b84ba4f2671febef295",
+      "b/pom.xml": "6a6ad8675628bdc02477fdf5bca9290a8e0e17e920778ec148f9415ecf505bef",
+      "pom.xml": "23fe44aedc2d5046fce39b5f3ad1e7c40896713483a4bfa219b1df030a24eaba"
+    }
+  },
+  {
+    "definition": {
+      "name": "concurrent-after-all",
+      "builder": "concurrent",
+      "threads": 1,
+      "phase": "after:all",
+      "single": false,
+      "failure": "",
+      "selection": "",
+      "contributors": "selected",
+      "lifecycle": "package",
+      "expectation": "success",
+      "nested": false,
+      "inheritance": "",
+      "purpose": "Change only the builder from seq-after-all. Check the child barrier."
+    },
+    "metadata": {
+      "case": "concurrent-after-all",
+      "purpose": "Change only the builder from seq-after-all. Check the child barrier.",
+      "builder": "concurrent",
+      "threads": 1,
+      "start_binding": "before:all",
+      "end_binding": "after:all",
+      "lifecycle": "package",
+      "selection": "",
+      "single_project": false,
+      "nested_group": false,
+      "contributor_policy": "selected",
+      "expectation": "success",
+      "intended_requirement": "Run one start before the intended contributors and one successful end after them.",
+      "expected_diagnostic": "Ordered hooks and matching ZIP contents in this bounded fixture."
+    },
+    "contract": "aggregation-fixture-v1:ac4ac2086979ee07f33be88a9f7fb437cd0eb302bf6a4a14423f5088bf8f15f8",
+    "inputs": {
+      "a/pom.xml": "3edd0bed56ce5f7532bc8254d1ec36e451a1683c663d5b84ba4f2671febef295",
+      "b/pom.xml": "6a6ad8675628bdc02477fdf5bca9290a8e0e17e920778ec148f9415ecf505bef",
+      "pom.xml": "23fe44aedc2d5046fce39b5f3ad1e7c40896713483a4bfa219b1df030a24eaba"
+    }
+  },
+  {
+    "definition": {
+      "name": "legacy-parallel-after-all",
+      "builder": "multithreaded",
+      "threads": 2,
+      "phase": "after:all",
+      "single": false,
+      "failure": "",
+      "selection": "",
+      "contributors": "selected",
+      "lifecycle": "package",
+      "expectation": "early",
+      "nested": false,
+      "inheritance": "",
+      "purpose": "Check the legacy multithreaded builder with an explicit after:all binding."
+    },
+    "metadata": {
+      "case": "legacy-parallel-after-all",
+      "purpose": "Check the legacy multithreaded builder with an explicit after:all binding.",
+      "builder": "multithreaded",
+      "threads": 2,
+      "start_binding": "before:all",
+      "end_binding": "after:all",
+      "lifecycle": "package",
+      "selection": "",
+      "single_project": false,
+      "nested_group": false,
+      "contributor_policy": "selected",
+      "expectation": "early",
+      "intended_requirement": "Run one start before the intended contributors and one successful end after them.",
+      "expected_diagnostic": "Reproduce the exact missing-contribution failure before child output exists."
+    },
+    "contract": "aggregation-fixture-v1:1c3e880bc33eb1cd5a189d7c161d6a81b684c47845b3ad198ce3a5ca75d52618",
+    "inputs": {
+      "a/pom.xml": "3edd0bed56ce5f7532bc8254d1ec36e451a1683c663d5b84ba4f2671febef295",
+      "b/pom.xml": "6a6ad8675628bdc02477fdf5bca9290a8e0e17e920778ec148f9415ecf505bef",
+      "pom.xml": "23fe44aedc2d5046fce39b5f3ad1e7c40896713483a4bfa219b1df030a24eaba"
+    }
+  },
+  {
+    "definition": {
+      "name": "concurrent-after-all-t2",
+      "builder": "concurrent",
+      "threads": 2,
+      "phase": "after:all",
+      "single": false,
+      "failure": "",
+      "selection": "",
+      "contributors": "selected",
+      "lifecycle": "package",
+      "expectation": "success",
+      "nested": false,
+      "inheritance": "",
+      "purpose": "Change only the builder from legacy-parallel-after-all. Keep two workers and after:all."
+    },
+    "metadata": {
+      "case": "concurrent-after-all-t2",
+      "purpose": "Change only the builder from legacy-parallel-after-all. Keep two workers and after:all.",
+      "builder": "concurrent",
+      "threads": 2,
+      "start_binding": "before:all",
+      "end_binding": "after:all",
+      "lifecycle": "package",
+      "selection": "",
+      "single_project": false,
+      "nested_group": false,
+      "contributor_policy": "selected",
+      "expectation": "success",
+      "intended_requirement": "Run one start before the intended contributors and one successful end after them.",
+      "expected_diagnostic": "Ordered hooks and matching ZIP contents in this bounded fixture."
+    },
+    "contract": "aggregation-fixture-v1:18c6c5675e73f716a3ab17576fdb865116fca844ba6705de76779bde888ee56d",
+    "inputs": {
+      "a/pom.xml": "3edd0bed56ce5f7532bc8254d1ec36e451a1683c663d5b84ba4f2671febef295",
+      "b/pom.xml": "6a6ad8675628bdc02477fdf5bca9290a8e0e17e920778ec148f9415ecf505bef",
+      "pom.xml": "23fe44aedc2d5046fce39b5f3ad1e7c40896713483a4bfa219b1df030a24eaba"
+    }
+  },
+  {
+    "definition": {
+      "name": "single-seq",
+      "builder": "singlethreaded",
+      "threads": 1,
+      "phase": "after:all",
+      "single": true,
+      "failure": "",
+      "selection": "",
+      "contributors": "selected",
+      "lifecycle": "package",
+      "expectation": "success",
+      "nested": false,
+      "inheritance": "",
+      "purpose": "Check exactly one start and end in a single-project sequential build."
+    },
+    "metadata": {
+      "case": "single-seq",
+      "purpose": "Check exactly one start and end in a single-project sequential build.",
+      "builder": "singlethreaded",
+      "threads": 1,
+      "start_binding": "before:all",
+      "end_binding": "after:all",
+      "lifecycle": "package",
+      "selection": "",
+      "single_project": true,
+      "nested_group": false,
+      "contributor_policy": "selected",
+      "expectation": "success",
+      "intended_requirement": "Run one start before the intended contributors and one successful end after them.",
+      "expected_diagnostic": "Ordered hooks and matching ZIP contents in this bounded fixture."
+    },
+    "contract": "aggregation-fixture-v1:518bc10002e8008399654a7d04a137677f138750b1c82f1a2ecbbcbb546cec18",
+    "inputs": {
+      "pom.xml": "6de823cb3f74005aac0a19b5d0ff3fb607222fbc50f7e1f8aa763881382edf6d"
+    }
+  },
+  {
+    "definition": {
+      "name": "single-concurrent",
+      "builder": "concurrent",
+      "threads": 1,
+      "phase": "after:all",
+      "single": true,
+      "failure": "",
+      "selection": "",
+      "contributors": "selected",
+      "lifecycle": "package",
+      "expectation": "success",
+      "nested": false,
+      "inheritance": "",
+      "purpose": "Change only the builder from single-seq."
+    },
+    "metadata": {
+      "case": "single-concurrent",
+      "purpose": "Change only the builder from single-seq.",
+      "builder": "concurrent",
+      "threads": 1,
+      "start_binding": "before:all",
+      "end_binding": "after:all",
+      "lifecycle": "package",
+      "selection": "",
+      "single_project": true,
+      "nested_group": false,
+      "contributor_policy": "selected",
+      "expectation": "success",
+      "intended_requirement": "Run one start before the intended contributors and one successful end after them.",
+      "expected_diagnostic": "Ordered hooks and matching ZIP contents in this bounded fixture."
+    },
+    "contract": "aggregation-fixture-v1:03893a950243385a4ba66aeba72845b0e2c2e6804d7cf9d280e3c2c6665bc87b",
+    "inputs": {
+      "pom.xml": "6de823cb3f74005aac0a19b5d0ff3fb607222fbc50f7e1f8aa763881382edf6d"
+    }
+  },
+  {
+    "definition": {
+      "name": "failure-fast",
+      "builder": "concurrent",
+      "threads": 1,
+      "phase": "after:all",
+      "single": false,
+      "failure": "--fail-fast",
+      "selection": "",
+      "contributors": "selected",
+      "lifecycle": "package",
+      "expectation": "child-failure",
+      "nested": false,
+      "inheritance": "",
+      "purpose": "Fail contributor a. Distinguish cleanup and attempted aggregation from success."
+    },
+    "metadata": {
+      "case": "failure-fast",
+      "purpose": "Fail contributor a. Distinguish cleanup and attempted aggregation from success.",
+      "builder": "concurrent",
+      "threads": 1,
+      "start_binding": "before:all",
+      "end_binding": "after:all",
+      "lifecycle": "package",
+      "selection": "",
+      "single_project": false,
+      "nested_group": false,
+      "contributor_policy": "selected",
+      "expectation": "child-failure",
+      "intended_requirement": "Allow the start hook, distinguish cleanup, and prevent successful aggregation for a failed build.",
+      "expected_diagnostic": "Reproduce child failure and end-attempt cleanup, without a ZIP or end-success marker."
+    },
+    "contract": "aggregation-fixture-v1:d981d33c4df7eac2ce921f3a9a4e623484d3b9a38545cd7f12a396e23289632c",
+    "inputs": {
+      "a/pom.xml": "3edd0bed56ce5f7532bc8254d1ec36e451a1683c663d5b84ba4f2671febef295",
+      "b/pom.xml": "6a6ad8675628bdc02477fdf5bca9290a8e0e17e920778ec148f9415ecf505bef",
+      "pom.xml": "23fe44aedc2d5046fce39b5f3ad1e7c40896713483a4bfa219b1df030a24eaba"
+    }
+  },
+  {
+    "definition": {
+      "name": "failure-end",
+      "builder": "concurrent",
+      "threads": 1,
+      "phase": "after:all",
+      "single": false,
+      "failure": "--fail-at-end",
+      "selection": "",
+      "contributors": "selected",
+      "lifecycle": "package",
+      "expectation": "child-failure",
+      "nested": false,
+      "inheritance": "",
+      "purpose": "Change only the failure policy from failure-fast. Check independent contributor b."
+    },
+    "metadata": {
+      "case": "failure-end",
+      "purpose": "Change only the failure policy from failure-fast. Check independent contributor b.",
+      "builder": "concurrent",
+      "threads": 1,
+      "start_binding": "before:all",
+      "end_binding": "after:all",
+      "lifecycle": "package",
+      "selection": "",
+      "single_project": false,
+      "nested_group": false,
+      "contributor_policy": "selected",
+      "expectation": "child-failure",
+      "intended_requirement": "Allow the start hook, distinguish cleanup, and prevent successful aggregation for a failed build.",
+      "expected_diagnostic": "Reproduce child failure and end-attempt cleanup, without a ZIP or end-success marker."
+    },
+    "contract": "aggregation-fixture-v1:8cd8f556961ee087fbff7d432a838c96dc4f55efe73eb250324a514174df468e",
+    "inputs": {
+      "a/pom.xml": "3edd0bed56ce5f7532bc8254d1ec36e451a1683c663d5b84ba4f2671febef295",
+      "b/pom.xml": "6a6ad8675628bdc02477fdf5bca9290a8e0e17e920778ec148f9415ecf505bef",
+      "pom.xml": "23fe44aedc2d5046fce39b5f3ad1e7c40896713483a4bfa219b1df030a24eaba"
+    }
+  },
+  {
+    "definition": {
+      "name": "verify-success",
+      "builder": "concurrent",
+      "threads": 1,
+      "phase": "after:all",
+      "single": false,
+      "failure": "",
+      "selection": "",
+      "contributors": "selected",
+      "lifecycle": "verify",
+      "expectation": "success",
+      "nested": false,
+      "inheritance": "",
+      "purpose": "Check normal aggregation after package outputs and verification."
+    },
+    "metadata": {
+      "case": "verify-success",
+      "purpose": "Check normal aggregation after package outputs and verification.",
+      "builder": "concurrent",
+      "threads": 1,
+      "start_binding": "before:all",
+      "end_binding": "after:all",
+      "lifecycle": "verify",
+      "selection": "",
+      "single_project": false,
+      "nested_group": false,
+      "contributor_policy": "selected",
+      "expectation": "success",
+      "intended_requirement": "Run one start before the intended contributors and one successful end after them.",
+      "expected_diagnostic": "Ordered hooks and matching ZIP contents in this bounded fixture."
+    },
+    "contract": "aggregation-fixture-v1:707584deddef3d0938216874959610b46549b00a046ba7ec241a4ea2b6228075",
+    "inputs": {
+      "a/pom.xml": "3edd0bed56ce5f7532bc8254d1ec36e451a1683c663d5b84ba4f2671febef295",
+      "b/pom.xml": "6a6ad8675628bdc02477fdf5bca9290a8e0e17e920778ec148f9415ecf505bef",
+      "pom.xml": "23fe44aedc2d5046fce39b5f3ad1e7c40896713483a4bfa219b1df030a24eaba"
+    }
+  },
+  {
+    "definition": {
+      "name": "failure-after-output",
+      "builder": "concurrent",
+      "threads": 1,
+      "phase": "after:all",
+      "single": false,
+      "failure": "--fail-fast",
+      "selection": "",
+      "contributors": "selected",
+      "lifecycle": "verify",
+      "expectation": "false-success",
+      "nested": false,
+      "inheritance": "",
+      "purpose": "Fail verification after contributions exist. Check whether after:all still creates a ZIP."
+    },
+    "metadata": {
+      "case": "failure-after-output",
+      "purpose": "Fail verification after contributions exist. Check whether after:all still creates a ZIP.",
+      "builder": "concurrent",
+      "threads": 1,
+      "start_binding": "before:all",
+      "end_binding": "after:all",
+      "lifecycle": "verify",
+      "selection": "",
+      "single_project": false,
+      "nested_group": false,
+      "contributor_policy": "selected",
+      "expectation": "false-success",
+      "intended_requirement": "Allow the start hook, distinguish cleanup, and prevent successful aggregation for a failed build.",
+      "expected_diagnostic": "Expose a valid ZIP and end-success marker despite a failed verification lifecycle."
+    },
+    "contract": "aggregation-fixture-v1:58587283de2eb1fce65b1c16b41c8add03aa255322f639cb4e118f1dcb955a48",
+    "inputs": {
+      "a/pom.xml": "3edd0bed56ce5f7532bc8254d1ec36e451a1683c663d5b84ba4f2671febef295",
+      "b/pom.xml": "6a6ad8675628bdc02477fdf5bca9290a8e0e17e920778ec148f9415ecf505bef",
+      "pom.xml": "23fe44aedc2d5046fce39b5f3ad1e7c40896713483a4bfa219b1df030a24eaba"
+    }
+  },
+  {
+    "definition": {
+      "name": "partial-root-expansion",
+      "builder": "concurrent",
+      "threads": 1,
+      "phase": "after:all",
+      "single": false,
+      "failure": "",
+      "selection": ".,a",
+      "contributors": "selected",
+      "lifecycle": "package",
+      "expectation": "success",
+      "nested": false,
+      "inheritance": "",
+      "purpose": "Observe Maven 4 expansion of selected root projects to their children."
+    },
+    "metadata": {
+      "case": "partial-root-expansion",
+      "purpose": "Observe Maven 4 expansion of selected root projects to their children.",
+      "builder": "concurrent",
+      "threads": 1,
+      "start_binding": "before:all",
+      "end_binding": "after:all",
+      "lifecycle": "package",
+      "selection": ".,a",
+      "single_project": false,
+      "nested_group": false,
+      "contributor_policy": "selected",
+      "expectation": "success",
+      "intended_requirement": "Observe how selecting the root expands the selected reactor. This is a selection diagnostic.",
+      "expected_diagnostic": "Ordered hooks and matching ZIP contents in this bounded fixture."
+    },
+    "contract": "aggregation-fixture-v1:a6635f340d799491eb0b708fa9b9464db479635001f7ce04d200f2276780bc0f",
+    "inputs": {
+      "a/pom.xml": "3edd0bed56ce5f7532bc8254d1ec36e451a1683c663d5b84ba4f2671febef295",
+      "b/pom.xml": "6a6ad8675628bdc02477fdf5bca9290a8e0e17e920778ec148f9415ecf505bef",
+      "pom.xml": "23fe44aedc2d5046fce39b5f3ad1e7c40896713483a4bfa219b1df030a24eaba"
+    }
+  },
+  {
+    "definition": {
+      "name": "partial-fixed",
+      "builder": "concurrent",
+      "threads": 1,
+      "phase": "after:all",
+      "single": false,
+      "failure": "",
+      "selection": ".,a,!b",
+      "contributors": "a,b",
+      "lifecycle": "package",
+      "expectation": "missing-b",
+      "nested": false,
+      "inheritance": "",
+      "purpose": "Keep a fixed contributor list while selecting only root and a."
+    },
+    "metadata": {
+      "case": "partial-fixed",
+      "purpose": "Keep a fixed contributor list while selecting only root and a.",
+      "builder": "concurrent",
+      "threads": 1,
+      "start_binding": "before:all",
+      "end_binding": "after:all",
+      "lifecycle": "package",
+      "selection": ".,a,!b",
+      "single_project": false,
+      "nested_group": false,
+      "contributor_policy": "a,b",
+      "expectation": "missing-b",
+      "intended_requirement": "Identify and aggregate the intended active contributors without a manually maintained dependency list.",
+      "expected_diagnostic": "Reproduce the exact missing-b failure from the fixed contributor list."
+    },
+    "contract": "aggregation-fixture-v1:2ad4e90f4ddbda8e83de6dbce9238feae661329120a16411a77c8bc7cfcef3a2",
+    "inputs": {
+      "a/pom.xml": "3edd0bed56ce5f7532bc8254d1ec36e451a1683c663d5b84ba4f2671febef295",
+      "b/pom.xml": "6a6ad8675628bdc02477fdf5bca9290a8e0e17e920778ec148f9415ecf505bef",
+      "pom.xml": "23fe44aedc2d5046fce39b5f3ad1e7c40896713483a4bfa219b1df030a24eaba"
+    }
+  },
+  {
+    "definition": {
+      "name": "partial-selected",
+      "builder": "concurrent",
+      "threads": 1,
+      "phase": "after:all",
+      "single": false,
+      "failure": "",
+      "selection": ".,a,!b",
+      "contributors": "selected",
+      "lifecycle": "package",
+      "expectation": "success",
+      "nested": false,
+      "inheritance": "",
+      "purpose": "Change only contributor selection from partial-fixed. Collect selected leaves."
+    },
+    "metadata": {
+      "case": "partial-selected",
+      "purpose": "Change only contributor selection from partial-fixed. Collect selected leaves.",
+      "builder": "concurrent",
+      "threads": 1,
+      "start_binding": "before:all",
+      "end_binding": "after:all",
+      "lifecycle": "package",
+      "selection": ".,a,!b",
+      "single_project": false,
+      "nested_group": false,
+      "contributor_policy": "selected",
+      "expectation": "success",
+      "intended_requirement": "Identify and aggregate the intended active contributors without a manually maintained dependency list.",
+      "expected_diagnostic": "Ordered hooks and matching ZIP contents in this bounded fixture."
+    },
+    "contract": "aggregation-fixture-v1:c073d02ee2bfe6dc7dd32f3961ff4cbd7c5f1ef95756bb334a37a4618060194e",
+    "inputs": {
+      "a/pom.xml": "3edd0bed56ce5f7532bc8254d1ec36e451a1683c663d5b84ba4f2671febef295",
+      "b/pom.xml": "6a6ad8675628bdc02477fdf5bca9290a8e0e17e920778ec148f9415ecf505bef",
+      "pom.xml": "23fe44aedc2d5046fce39b5f3ad1e7c40896713483a4bfa219b1df030a24eaba"
+    }
+  },
+  {
+    "definition": {
+      "name": "partial-no-root",
+      "builder": "concurrent",
+      "threads": 1,
+      "phase": "after:all",
+      "single": false,
+      "failure": "",
+      "selection": "a",
+      "contributors": "selected",
+      "lifecycle": "package",
+      "expectation": "no-root",
+      "nested": false,
+      "inheritance": "",
+      "purpose": "Exclude the root. Check whether root bindings still provide session hooks."
+    },
+    "metadata": {
+      "case": "partial-no-root",
+      "purpose": "Exclude the root. Check whether root bindings still provide session hooks.",
+      "builder": "concurrent",
+      "threads": 1,
+      "start_binding": "before:all",
+      "end_binding": "after:all",
+      "lifecycle": "package",
+      "selection": "a",
+      "single_project": false,
+      "nested_group": false,
+      "contributor_policy": "selected",
+      "expectation": "no-root",
+      "intended_requirement": "Provide one session start and end even when the selected reactor excludes the root.",
+      "expected_diagnostic": "Expose the absence of root hooks while selected child a completes."
+    },
+    "contract": "aggregation-fixture-v1:dcee69cb9764869501034fac4d59501db2447c51d4b5141a2d8e10da1ad8a8c6",
+    "inputs": {
+      "a/pom.xml": "3edd0bed56ce5f7532bc8254d1ec36e451a1683c663d5b84ba4f2671febef295",
+      "b/pom.xml": "6a6ad8675628bdc02477fdf5bca9290a8e0e17e920778ec148f9415ecf505bef",
+      "pom.xml": "23fe44aedc2d5046fce39b5f3ad1e7c40896713483a4bfa219b1df030a24eaba"
+    }
+  },
+  {
+    "definition": {
+      "name": "nested-group",
+      "builder": "concurrent",
+      "threads": 1,
+      "phase": "after:all",
+      "single": false,
+      "failure": "",
+      "selection": "",
+      "contributors": "group",
+      "lifecycle": "package",
+      "expectation": "success",
+      "nested": true,
+      "inheritance": "",
+      "purpose": "Run hooks at group, collect group/a and group/b, and exclude the outside sibling."
+    },
+    "metadata": {
+      "case": "nested-group",
+      "purpose": "Run hooks at group, collect group/a and group/b, and exclude the outside sibling.",
+      "builder": "concurrent",
+      "threads": 1,
+      "start_binding": "before:all",
+      "end_binding": "after:all",
+      "lifecycle": "package",
+      "selection": "",
+      "single_project": false,
+      "nested_group": true,
+      "contributor_policy": "group",
+      "expectation": "success",
+      "intended_requirement": "Run hooks once at the selected group and collect only its active leaf contributors.",
+      "expected_diagnostic": "Ordered hooks and matching ZIP contents in this bounded fixture."
+    },
+    "contract": "aggregation-fixture-v1:52f1e37067733d8c11e66d1ee06d8416a3dbf6b706d5d10c87709409ac29f1d1",
+    "inputs": {
+      "group/a/pom.xml": "9f289a39fa39138116e3dd3df1c87472fe58b9a56bf2818a3669997155703f86",
+      "group/b/pom.xml": "2fd9ed5ad2698a7e5732c3e37c96d2fc5fecff850e75ea77ea00f064a797ac95",
+      "group/pom.xml": "f9e6e1da3f7dee731cfe238fb2da0035af10cfed78e0084b5297048098818f2a",
+      "outside/pom.xml": "2ace9aa28781caeaef588af66f6b6b244038b7eedf443d03d184a4e4ddade77f",
+      "pom.xml": "5397a101d099433fd2ecbf72f10e2129821518818ba6a9460eabb954495d8e24"
+    }
+  },
+  {
+    "definition": {
+      "name": "nested-selected",
+      "builder": "concurrent",
+      "threads": 1,
+      "phase": "after:all",
+      "single": false,
+      "failure": "",
+      "selection": "group,group/a,!group/b",
+      "contributors": "group",
+      "lifecycle": "package",
+      "expectation": "success",
+      "nested": true,
+      "inheritance": "",
+      "purpose": "Keep the group boundary while selecting only group/a as contributor."
+    },
+    "metadata": {
+      "case": "nested-selected",
+      "purpose": "Keep the group boundary while selecting only group/a as contributor.",
+      "builder": "concurrent",
+      "threads": 1,
+      "start_binding": "before:all",
+      "end_binding": "after:all",
+      "lifecycle": "package",
+      "selection": "group,group/a,!group/b",
+      "single_project": false,
+      "nested_group": true,
+      "contributor_policy": "group",
+      "expectation": "success",
+      "intended_requirement": "Run hooks once at the selected group and collect only its active leaf contributors.",
+      "expected_diagnostic": "Ordered hooks and matching ZIP contents in this bounded fixture."
+    },
+    "contract": "aggregation-fixture-v1:885bd7294e9659524882f741a2f61c6a49916e7a52fca82a092f962f1b304e79",
+    "inputs": {
+      "group/a/pom.xml": "9f289a39fa39138116e3dd3df1c87472fe58b9a56bf2818a3669997155703f86",
+      "group/b/pom.xml": "2fd9ed5ad2698a7e5732c3e37c96d2fc5fecff850e75ea77ea00f064a797ac95",
+      "group/pom.xml": "f9e6e1da3f7dee731cfe238fb2da0035af10cfed78e0084b5297048098818f2a",
+      "outside/pom.xml": "2ace9aa28781caeaef588af66f6b6b244038b7eedf443d03d184a4e4ddade77f",
+      "pom.xml": "5397a101d099433fd2ecbf72f10e2129821518818ba6a9460eabb954495d8e24"
+    }
+  },
+  {
+    "definition": {
+      "name": "inheritance-off",
+      "builder": "concurrent",
+      "threads": 1,
+      "phase": "after:all",
+      "single": false,
+      "failure": "",
+      "selection": "",
+      "contributors": "selected",
+      "lifecycle": "package",
+      "expectation": "success",
+      "nested": false,
+      "inheritance": "off",
+      "purpose": "Disable inherited hook bindings. Check one root start and finish."
+    },
+    "metadata": {
+      "case": "inheritance-off",
+      "purpose": "Disable inherited hook bindings. Check one root start and finish.",
+      "builder": "concurrent",
+      "threads": 1,
+      "start_binding": "before:all",
+      "end_binding": "after:all",
+      "lifecycle": "package",
+      "selection": "",
+      "single_project": false,
+      "nested_group": false,
+      "contributor_policy": "selected",
+      "expectation": "success",
+      "intended_requirement": "Run one start before the intended contributors and one successful end after them.",
+      "expected_diagnostic": "Ordered hooks and matching ZIP contents in this bounded fixture."
+    },
+    "contract": "aggregation-fixture-v1:25c95c71c8da96a138f0d303fbae148980f84a26d357b907ab048715858164c2",
+    "inputs": {
+      "a/pom.xml": "3edd0bed56ce5f7532bc8254d1ec36e451a1683c663d5b84ba4f2671febef295",
+      "b/pom.xml": "6a6ad8675628bdc02477fdf5bca9290a8e0e17e920778ec148f9415ecf505bef",
+      "pom.xml": "b29e9a7fec6278ff9be2e10c3d4138f4338a863f95dbef1de3c53d81b7b0a4f8"
+    }
+  },
+  {
+    "definition": {
+      "name": "inheritance-on",
+      "builder": "concurrent",
+      "threads": 1,
+      "phase": "after:all",
+      "single": false,
+      "failure": "",
+      "selection": "",
+      "contributors": "selected",
+      "lifecycle": "package",
+      "expectation": "inherited-copies",
+      "nested": false,
+      "inheritance": "on",
+      "purpose": "Change only inheritance from inheritance-off. Count copies despite aggregator=true."
+    },
+    "metadata": {
+      "case": "inheritance-on",
+      "purpose": "Change only inheritance from inheritance-off. Count copies despite aggregator=true.",
+      "builder": "concurrent",
+      "threads": 1,
+      "start_binding": "before:all",
+      "end_binding": "after:all",
+      "lifecycle": "package",
+      "selection": "",
+      "single_project": false,
+      "nested_group": false,
+      "contributor_policy": "selected",
+      "expectation": "inherited-copies",
+      "intended_requirement": "Run one start before the intended contributors and one successful end after them.",
+      "expected_diagnostic": "Count exactly three start and finish executions: root, a, and b."
+    },
+    "contract": "aggregation-fixture-v1:0ffbbb2c04935f76434cdfc6afa6a151f4d870d0991b583f0f4295c77cda3d22",
+    "inputs": {
+      "a/pom.xml": "3edd0bed56ce5f7532bc8254d1ec36e451a1683c663d5b84ba4f2671febef295",
+      "b/pom.xml": "6a6ad8675628bdc02477fdf5bca9290a8e0e17e920778ec148f9415ecf505bef",
+      "pom.xml": "2408c2258c032ccf2568fecd23789d272549a0c816d56f48c54557bd79d4841d"
+    }
+  },
+  {
+    "definition": {
+      "name": "explicit-child-hooks",
+      "builder": "concurrent",
+      "threads": 1,
+      "phase": "after:all",
+      "single": false,
+      "failure": "",
+      "selection": "",
+      "contributors": "selected",
+      "lifecycle": "package",
+      "expectation": "explicit-copies",
+      "nested": false,
+      "inheritance": "explicit",
+      "purpose": "Keep inheritance disabled, then add independent start and finish bindings in child a."
+    },
+    "metadata": {
+      "case": "explicit-child-hooks",
+      "purpose": "Keep inheritance disabled, then add independent start and finish bindings in child a.",
+      "builder": "concurrent",
+      "threads": 1,
+      "start_binding": "before:all",
+      "end_binding": "after:all",
+      "lifecycle": "package",
+      "selection": "",
+      "single_project": false,
+      "nested_group": false,
+      "contributor_policy": "selected",
+      "expectation": "explicit-copies",
+      "intended_requirement": "Observe independently declared child hooks. Duplicate suppression policy is undefined for explicit declarations.",
+      "expected_diagnostic": "Count exactly two start and finish executions: root and explicitly configured child a."
+    },
+    "contract": "aggregation-fixture-v1:7bc92d4e394f0b22f8a4e2ae4de6e5ce1299dc01ebe04f72bbd958aaaab920f6",
+    "inputs": {
+      "a/pom.xml": "31efbf7d84d4372ffde80b1c2885d85c2c095ea3a78a1ca6c16ccff791336453",
+      "b/pom.xml": "6a6ad8675628bdc02477fdf5bca9290a8e0e17e920778ec148f9415ecf505bef",
+      "pom.xml": "b29e9a7fec6278ff9be2e10c3d4138f4338a863f95dbef1de3c53d81b7b0a4f8"
+    }
+  },
+  {
+    "definition": {
+      "name": "site-seq",
+      "builder": "singlethreaded",
+      "threads": 1,
+      "phase": "after:site",
+      "single": false,
+      "failure": "",
+      "selection": "",
+      "contributors": "selected",
+      "lifecycle": "site",
+      "expectation": "early",
+      "nested": false,
+      "inheritance": "",
+      "purpose": "Check root before:site and after:site hooks in a multi-module site lifecycle."
+    },
+    "metadata": {
+      "case": "site-seq",
+      "purpose": "Check root before:site and after:site hooks in a multi-module site lifecycle.",
+      "builder": "singlethreaded",
+      "threads": 1,
+      "start_binding": "before:site",
+      "end_binding": "after:site",
+      "lifecycle": "site",
+      "selection": "",
+      "single_project": false,
+      "nested_group": false,
+      "contributor_policy": "selected",
+      "expectation": "early",
+      "intended_requirement": "Run one start before the intended contributors and one successful end after them.",
+      "expected_diagnostic": "Reproduce the exact missing-contribution failure before child output exists."
+    },
+    "contract": "aggregation-fixture-v1:a55ba98eefe225febbc7f2020a3cfb44a7ea9b1beaf656fe0aa6158ffd07fc1f",
+    "inputs": {
+      "a/pom.xml": "00e8f1317d8498621b77104cb8df06ff7aa1d02c27d104427b541b6a383e8d15",
+      "b/pom.xml": "39bf9b9d6c06b2b9b410872132a296f8aab3f0c42a6fc64504938b7a014fe766",
+      "pom.xml": "65162fc0792e607e83f53d3d24ffb1769cb418ee8f986dfe2c7ad411c4917b8e"
+    }
+  },
+  {
+    "definition": {
+      "name": "site-concurrent",
+      "builder": "concurrent",
+      "threads": 1,
+      "phase": "after:site",
+      "single": false,
+      "failure": "",
+      "selection": "",
+      "contributors": "selected",
+      "lifecycle": "site",
+      "expectation": "timing-diagnostic",
+      "nested": false,
+      "inheritance": "",
+      "purpose": "Change only the builder from site-seq. Observe site child ordering."
+    },
+    "metadata": {
+      "case": "site-concurrent",
+      "purpose": "Change only the builder from site-seq. Observe site child ordering.",
+      "builder": "concurrent",
+      "threads": 1,
+      "start_binding": "before:site",
+      "end_binding": "after:site",
+      "lifecycle": "site",
+      "selection": "",
+      "single_project": false,
+      "nested_group": false,
+      "contributor_policy": "selected",
+      "expectation": "timing-diagnostic",
+      "intended_requirement": "Run one start before the intended contributors and one successful end after them.",
+      "expected_diagnostic": "Check either an ordered successful trace or an exact early-output diagnostic. No barrier claim."
+    },
+    "contract": "aggregation-fixture-v1:26d3863ea0338064a872c6826d3232362ef2542469b585e618f676a10a3902d1",
+    "inputs": {
+      "a/pom.xml": "00e8f1317d8498621b77104cb8df06ff7aa1d02c27d104427b541b6a383e8d15",
+      "b/pom.xml": "39bf9b9d6c06b2b9b410872132a296f8aab3f0c42a6fc64504938b7a014fe766",
+      "pom.xml": "65162fc0792e607e83f53d3d24ffb1769cb418ee8f986dfe2c7ad411c4917b8e"
+    }
+  },
+  {
+    "definition": {
+      "name": "site-single",
+      "builder": "singlethreaded",
+      "threads": 1,
+      "phase": "after:site",
+      "single": true,
+      "failure": "",
+      "selection": "",
+      "contributors": "selected",
+      "lifecycle": "site",
+      "expectation": "success",
+      "nested": false,
+      "inheritance": "",
+      "purpose": "Check the site hooks in one project without a child-ordering requirement."
+    },
+    "metadata": {
+      "case": "site-single",
+      "purpose": "Check the site hooks in one project without a child-ordering requirement.",
+      "builder": "singlethreaded",
+      "threads": 1,
+      "start_binding": "before:site",
+      "end_binding": "after:site",
+      "lifecycle": "site",
+      "selection": "",
+      "single_project": true,
+      "nested_group": false,
+      "contributor_policy": "selected",
+      "expectation": "success",
+      "intended_requirement": "Run one start before the intended contributors and one successful end after them.",
+      "expected_diagnostic": "Ordered hooks and matching ZIP contents in this bounded fixture."
+    },
+    "contract": "aggregation-fixture-v1:43fcaa5729520d55f76f422d9d23b72a18a7465e2613db690bcef5f61ba84ca4",
+    "inputs": {
+      "pom.xml": "0e1a127845da13ef9be7902cc6341ae4d0665967ae1023ffd0cbbc3344b0e0a8"
+    }
+  },
+  {
+    "definition": {
+      "name": "real-site-report",
+      "builder": "singlethreaded",
+      "threads": 1,
+      "phase": "after:all",
+      "single": false,
+      "failure": "",
+      "selection": "",
+      "contributors": "selected",
+      "lifecycle": "site",
+      "expectation": "real-site-rendering",
+      "nested": false,
+      "inheritance": "",
+      "purpose": "Render an actual Maven site and one aggregate Javadoc report from two child source trees."
+    },
+    "metadata": {
+      "case": "real-site-report",
+      "purpose": "Render an actual Maven site with one aggregate Javadoc report from two child source trees.",
+      "builder": "singlethreaded",
+      "threads": 1,
+      "start_binding": "not applicable",
+      "end_binding": "site reporting: aggregate-no-fork",
+      "lifecycle": "site",
+      "selection": "full reactor: root, a, b",
+      "single_project": false,
+      "contributor_policy": "The Javadoc report collects sources from both child modules.",
+      "expectation": "real-site-rendering",
+      "intended_requirement": "Generate real aggregate documentation and a rendered site from multiple module inputs.",
+      "expected_diagnostic": "One aggregate Javadoc report contains both classes and the rendered site links to it.",
+      "limitations": [
+        "This report aggregates available source inputs. It does not consume completed child site outputs.",
+        "The sequential root site executes before child sites. This case does not establish a site child barrier.",
+        "This case does not validate coverage or PITest reporting."
+      ],
+      "plugin_versions": {
+        "maven-site-plugin": "3.21.0",
+        "maven-javadoc-plugin": "3.11.2"
+      }
+    },
+    "contract": "aggregation-fixture-v1:6cb61c309d784660c678e8a8ffbef53d8c918f63bd8f774e1697493705c212ab",
+    "inputs": {
+      "a/pom.xml": "bd227818bed5c84cc2d3713521d83b36ba6953bd5e295ac3b9e7307ca1b6febe",
+      "a/src/main/java/maven/aggregator/lab/site/Alpha.java": "2a314266e6a0240e64d815443f9500ae3bf27667947f21edd45e9fc7d44f9f4d",
+      "b/pom.xml": "cda362e55c0447778d8c3e64c906afb36d2502fd5de84e1163252f7a537f4293",
+      "b/src/main/java/maven/aggregator/lab/site/Beta.java": "81da53b1092682b15c8c156a447b92615cba492c4772a20ef048131e933b483c",
+      "pom.xml": "1ce328c4329826c0eb0ccc2ff578895e6f5027fc71cb1b64b5917c2f264d38b6",
+      "src/site/markdown/index.md": "09c6146522e4912e22a6badea1ec81eca9ad370fe5dbf980d03ce663b8f579e4"
+    }
+  }
+]

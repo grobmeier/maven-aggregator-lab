@@ -66,4 +66,3 @@ class Handler:
     function: Callable
     dependencies: tuple[Callable, ...] = ()
     constants: tuple = ()
-
