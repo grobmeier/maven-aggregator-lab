@@ -304,6 +304,15 @@ def generate_report(directory, compare_to=None):
             elif line.startswith("OS name:"):
                 version_lines.append(line)
     version = " · ".join(safe_text(line) for line in version_lines) or "Maven version metadata is missing."
+    provenance = load_json(directory / "run.json")
+    source = provenance.get("maven_source") if isinstance(provenance, dict) else None
+    if isinstance(source, dict):
+        version += "<br>Source revision: " + safe_text(source.get("requested_ref", "Not recorded"))
+        version += " · commit " + safe_text(source.get("commit", "Not recorded"))
+        for relative, label in (("maven-build/build.json", "Source build provenance"), ("maven-build/build.log", "Source build log")):
+            if (directory / relative).is_file():
+                version += f' · <a href="{relative}">{label}</a>'
+        version += "<br>The distribution build skips Maven core tests. Case results describe only the selected lab fixtures."
     summary = "".join(f'<button data-filter="{key}" class="stat {key}"><strong>{counts[key]}</strong><span>{icon} {label}</span></button>'
                       for key, (icon, label) in STATUSES.items())
     warning = ""

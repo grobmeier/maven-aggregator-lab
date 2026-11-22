@@ -33,13 +33,20 @@ def main(lab, run_case, prepare, preflight_command, update):
     parser.add_argument("--json", action="store_true", help="Print discovery or planning output as JSON.")
     parser.add_argument("--list", action="store_true", help="List cases without starting Maven.")
     parser.add_argument("--report-only", action="store_true", help="Regenerate a saved report without starting Maven.")
-    parser.add_argument("--maven", default=os.environ.get("MAVEN4", "mvn"), help="Select Maven 4.1.x or 4.2.x. Default: MAVEN4, then mvn.")
+    target = parser.add_mutually_exclusive_group()
+    target.add_argument("--maven", help="Select a built Maven executable. Default: MAVEN4, then mvn.")
+    target.add_argument("--maven-source", type=Path, help="Build a committed revision from this local Maven Git checkout.")
+    parser.add_argument("--maven-ref", help="Select a local branch, tag, or commit. Source mode default: HEAD.")
+    parser.add_argument("--bootstrap-maven", help="Select Maven for building the source. Default: BOOTSTRAP_MAVEN, then mvn.")
     parser.add_argument("--output-dir", type=Path, help="Reserve this new evidence directory. Existing directories are rejected.")
     parser.add_argument("--run-name", help="Reserve acceptance-runs/NAME. Existing names are rejected.")
     parser.add_argument("--compare-to", type=Path, help="Compare with a saved run directory. Preserve the baseline.")
     parser.add_argument("--require-all", action="store_true", help="Exit 2 if any selected requirement is not met. Harness errors exit 1.")
     parser.add_argument("--validate-only", action="store_true", help=argparse.SUPPRESS)
     args = parser.parse_args()
+    if (args.maven_ref or args.bootstrap_maven) and not args.maven_source:
+        parser.error("Use --maven-source with --maven-ref or --bootstrap-maven.")
+    args.maven = args.maven or os.environ.get("MAVEN4", "mvn")
     configure("never" if args.json or args.command == "reference" else args.color)
     if args.case_id and args.command != "show":
         parser.error("A positional case ID is valid only with show.")
@@ -81,10 +88,20 @@ def main(lab, run_case, prepare, preflight_command, update):
                                  ("Execute", metadata["execution"])):
                 print(paint(title + ":", "title") + " " + value)
         return
+    source_spec = None
+    if args.maven_source and not (args.list or args.command in ("list", "show", "report", "reference") or args.report_only):
+        from source_build import resolve_source
+        try:
+            source_spec = resolve_source(args.maven_source, args.maven_ref or "HEAD")
+        except (OSError, ValueError, subprocess.SubprocessError) as error:
+            parser.error(str(error))
     if args.dry_run:
+        if source_spec and not args.json:
+            print("Source commit: " + source_spec["commit"] + " (committed files only)")
+            print("Source preparation: build an isolated distribution before running cases.")
         common = ["-B", "-ntp", "-Dstyle.color=never", "-Dmaven.repo.local=<private-repository>",
                   "--settings", "<settings-file>", "--global-settings", "<global-settings-file>"]
-        plans = [{"case": case.name, "command": build_command(case, Path("<run-directory>") / case.name, args.maven, common)}
+        plans = [{"case": case.name, **({"maven_source": source_spec} if source_spec else {}), "command": build_command(case, Path("<run-directory>") / case.name, "<source-distribution>/bin/mvn" if source_spec else args.maven, common)}
                  for case in selected]
         if args.json:
             print(json.dumps(plans, indent=2))
@@ -107,7 +124,10 @@ def main(lab, run_case, prepare, preflight_command, update):
     try:
         if args.compare_to:
             baseline = read_results(args.compare_to)
-        maven, version = preflight_command(args.maven)
+        if source_spec:
+            maven, version = None, "Maven source build pending.\n"
+        else:
+            maven, version = preflight_command(args.maven)
         output = reserve_output(lab, args.output_dir, args.run_name)
     except (OSError, ValueError, subprocess.SubprocessError) as error:
         parser.error(str(error))
@@ -115,7 +135,7 @@ def main(lab, run_case, prepare, preflight_command, update):
     manifest = {"schema_version": 2, "cases": [case_metadata(case) for case in selected], "catalogue": catalogue}
     (output / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
     (output / "maven-version.txt").write_text(version)
-    provenance = {"maven_executable": maven, "suite_command": sys.argv, "version": version,
+    provenance = {"maven_executable": maven, "maven_source": source_spec, "suite_command": sys.argv, "version": version,
                   "selected_cases": [case.name for case in selected],
                   "comparison_limit": "Different source revisions can explain differences. A Maven version does not prove patch inclusion."}
     (output / "run.json").write_text(json.dumps(provenance, indent=2) + "\n")
@@ -128,13 +148,23 @@ def main(lab, run_case, prepare, preflight_command, update):
         (output / "results.json").write_text(json.dumps(reports, indent=2) + "\n")
         generate_report(output)
     print(paint("Run directory:", "title") + " " + str(output), flush=True)
+    stage = "source-build" if source_spec else "preparation"
     try:
+        if source_spec:
+            from source_build import build_maven
+            maven, source_evidence = build_maven(source_spec, output,
+                args.bootstrap_maven or os.environ.get("BOOTSTRAP_MAVEN", "mvn"), lab)
+            maven, version = preflight_command(maven)
+            provenance.update(maven_executable=maven, version=version, maven_source=source_evidence)
+            (output / "run.json").write_text(json.dumps(provenance, indent=2) + "\n")
+            (output / "maven-version.txt").write_text(version)
+        stage = "preparation"
         common = prepare(lab, output, maven)
     except (OSError, ValueError, RuntimeError, subprocess.SubprocessError) as error:
         for case in selected:
             root = output / case.name
             root.mkdir()
-            result = {**case_metadata(case), "execution_stage": "preparation", "assertions": "FAILED",
+            result = {**case_metadata(case), "execution_stage": stage, "assertions": "FAILED",
                       "requirement_state": "inconclusive", "requirement_reason": str(error), "observation": str(error),
                       "requirement_contract": requirement_contract(case), "events": [], "command": []}
             (root / "result.json").write_text(json.dumps(result, indent=2) + "\n")
