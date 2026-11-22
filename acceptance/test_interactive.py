@@ -5,6 +5,7 @@ from contextlib import redirect_stdout
 import io
 import json
 from pathlib import Path
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -102,6 +103,46 @@ class InteractiveTests(unittest.TestCase):
         with mock.patch.object(sys.stdin, "isatty", return_value=False), mock.patch("sys.stderr", new=io.StringIO()):
             self.assertEqual(interactive.main(), 2)
         self.assertFalse(self.state.exists())
+
+    def test_run_opens_its_own_report_and_preserves_exit_code(self):
+        # A different run can update latest.json before this process returns.
+        stale = self.root / "acceptance-runs/other/report.html"
+        stale.parent.mkdir(parents=True)
+        stale.write_text("other run")
+        def execute(command):
+            name = command[command.index("--run-name") + 1]
+            report = self.root / "acceptance-runs" / name / "report.html"
+            report.parent.mkdir(parents=True)
+            report.write_text("this run")
+            (self.root / "acceptance-runs/latest.json").write_text(json.dumps({"directory": str(stale.parent)}))
+            return subprocess.CompletedProcess(command, 1)
+        with mock.patch.object(interactive.subprocess, "run", side_effect=execute) as run, mock.patch.object(interactive.webbrowser, "open", return_value=True) as browser, redirect_stdout(io.StringIO()):
+            self.assertEqual(interactive.run_selection(self.root, ["run"]), 1)
+        name = run.call_args.args[0][-1]
+        browser.assert_called_once_with((self.root / "acceptance-runs" / name / "report.html").as_uri())
+
+    def test_preview_and_preflight_failure_do_not_open_old_reports(self):
+        stale = self.root / "acceptance-runs/old/report.html"
+        stale.parent.mkdir(parents=True)
+        stale.write_text("old")
+        with mock.patch.object(interactive.subprocess, "run", return_value=subprocess.CompletedProcess([], 2)) as run, mock.patch.object(interactive.webbrowser, "open") as browser, redirect_stdout(io.StringIO()):
+            for args in (["run", "--dry-run"], ["run"], ["run", "--run-name", "old"]):
+                self.assertEqual(interactive.run_selection(self.root, args), 2)
+            browser.assert_not_called()
+        self.assertNotIn("--run-name", run.call_args_list[0].args[0])
+
+    def test_browser_failure_keeps_run_result_and_prints_report_path(self):
+        report = self.root / "acceptance-runs/named run/report.html"
+        report.parent.mkdir(parents=True)
+        def execute(command):
+            report.write_text("report")
+            return subprocess.CompletedProcess(command, 0)
+        for failure in (False, OSError("no browser")):
+            stderr = io.StringIO()
+            report.unlink(missing_ok=True)
+            with mock.patch.object(interactive.subprocess, "run", side_effect=execute), mock.patch.object(interactive.webbrowser, "open", side_effect=[failure]), mock.patch("sys.stderr", stderr), redirect_stdout(io.StringIO()):
+                self.assertEqual(interactive.run_selection(self.root, ["run", "--run-name", "named run"]), 0)
+            self.assertIn(str(report), stderr.getvalue())
 
 
 

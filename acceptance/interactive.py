@@ -13,6 +13,7 @@ import sys
 import tempfile
 from datetime import datetime, timezone
 import uuid
+import webbrowser
 from catalogue import CASES, GROUPS
 from interactive_ui import Cancelled, TerminalUI
 from progress import read_results
@@ -245,6 +246,29 @@ def wizard(ui, lab, path):
             ui.message(str(error))
 
 
+def run_selection(lab, args):
+    args = list(args)
+    report = None
+    if "--dry-run" not in args:
+        if "--run-name" not in args:
+            args += ["--run-name", "interactive-" + uuid.uuid4().hex]
+        name = args[args.index("--run-name") + 1]
+        report = lab / "acceptance-runs" / name / "report.html"
+        if report.exists():
+            report = None
+    command = [str(lab / "acceptance-suite.sh"), *args]
+    print("$ " + shlex.join(command), flush=True)
+    result = subprocess.run(command)
+    if report is not None and report.is_file():
+        try:
+            opened = webbrowser.open(report.resolve().as_uri())
+        except (OSError, webbrowser.Error):
+            opened = False
+        if not opened:
+            print("Open the report manually: " + str(report), file=sys.stderr)
+    return result.returncode
+
+
 def main():
     if not sys.stdin.isatty() or not sys.stdout.isatty():
         print("Run ./run.sh in a terminal for interactive menus. Use acceptance-suite.sh for scripts.", file=sys.stderr)
@@ -259,9 +283,7 @@ def main():
         args = curses.wrapper(lambda screen: wizard(TerminalUI(screen, curses), lab, state_path()))
         if args is None:
             return 0
-        command = [str(lab / "acceptance-suite.sh"), *args]
-        print("$ " + shlex.join(command), flush=True)
-        return subprocess.run(command).returncode
+        return run_selection(lab, args)
     except (Cancelled, KeyboardInterrupt):
         print("Cancelled.")
         return 130

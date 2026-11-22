@@ -13,6 +13,7 @@ Use arrow keys and Enter to select Maven, cases, comparison, label, exit policy,
 Browse folders or paste a path. Left opens the parent. Right opens a child.
 Use **Show hidden folders** for paths such as `.sdkman`.
 Select **Run**, **Preview commands only**, **Edit selections**, or **Cancel** before execution.
+After a run, the launcher opens its HTML report in your default browser. Previews do not open reports.
 Esc returns to the home menu. Ctrl+C exits. Python needs `curses`. No `sudo` needed.
 
 The launcher remembers ten configurations. **Forget saved selections** preserves run evidence.
