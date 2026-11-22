@@ -5,6 +5,10 @@ The registered definitions under `cases/` are the authoritative case registry.
 
 ## Find and execute cases
 
+Use `./run.sh` for interactive menus, folder browsing, and remembered selections.
+The [lab guide](../README.md#run-from-maven-source) describes source revision builds and their evidence.
+The menus obtain case IDs and groups from the registry.
+
 ```bash
 ./acceptance-suite.sh list
 ./acceptance-suite.sh list --group ordering
