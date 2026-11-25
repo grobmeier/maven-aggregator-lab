@@ -1,7 +1,7 @@
 # Acceptance suite
 
 Use [CASES.md](CASES.md) for the generated catalogue and [EXTENDING.md](EXTENDING.md) for execution and extension instructions.
-The registry contains 25 cases grouped by ordering, failure, selection, inheritance, and site.
+The registry contains 26 cases grouped by ordering, failure, selection, inheritance, and site.
 
 ```bash
 ./acceptance-suite.sh list --group ordering

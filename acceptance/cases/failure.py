@@ -38,4 +38,17 @@ CASES = [
         failure_stage='after-output',
         order=11,
     ),
+    Case(
+        'seq-failure-after-output',
+        builder='singlethreaded',
+        lifecycle='verify',
+        failure='--fail-fast',
+        expectation='false-success',
+        purpose='Fail verification after output with the sequential builder. Require no successful aggregate.',
+        group='failure',
+        requirement_policy='success_only',
+        requirement='Allow the start hook, distinguish cleanup, and prevent successful aggregation for a failed build.',
+        failure_stage='after-output',
+        comparisons=(('failure-after-output', 'Builder only'),),
+    ),
 ]

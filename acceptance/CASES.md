@@ -28,6 +28,7 @@ The smoke set covers sequential, concurrent, and standalone ordering.
 | `failure-fast` | Fail contributor a. Distinguish cleanup and attempted aggregation from success. | `failure_safety` |
 | `failure-end` | Change only the failure policy from failure-fast. Check independent contributor b. | `failure_safety` |
 | `failure-after-output` | Fail verification after contributions exist. Check whether after:all still creates a ZIP. | `success_only` |
+| `seq-failure-after-output` | Fail verification after output with the sequential builder. Require no successful aggregate. | `success_only` |
 
 ## Selection
 

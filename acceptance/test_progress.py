@@ -91,6 +91,29 @@ class ProgressTests(unittest.TestCase):
         contribution.write_text("a\n")
         self.assertEqual(suite.assess(case, self.root, 1, "DEMO_CHILD_FAILURE:a")[:2], ("met", "passed"))
 
+    def test_sequential_verification_failure_without_aggregate_is_met(self):
+        case = next(case for case in suite.CASES if case.name == "seq-failure-after-output")
+        self.events.write_text("start:fixture-root\nwork:a\nchild-failure:a\n")
+        contribution = self.root / "a/target/contribution.txt"
+        contribution.parent.mkdir(parents=True)
+        contribution.write_text("a\n")
+        self.assertEqual(suite.assess(case, self.root, 1, "DEMO_CHILD_FAILURE:a")[:2], ("met", "passed"))
+
+    def test_sequential_failure_requires_output_before_the_deliberate_failure(self):
+        case = next(case for case in suite.CASES if case.name == "seq-failure-after-output")
+        for events, log in (("start:fixture-root\nchild-failure:a\n", "DEMO_CHILD_FAILURE:a"),
+                            ("start:fixture-root\nwork:a\nchild-failure:a\n", "Unrelated plugin failure"),
+                            ("start:fixture-root\nwork:a\nchild-failure:a\n", "DEMO_CHILD_FAILURE:a")):
+            with self.subTest(events=events, log=log):
+                self.events.write_text(events)
+                self.assertEqual(suite.assess(case, self.root, 1, log)[:2], ("inconclusive", "FAILED"))
+
+    def test_sequential_false_aggregate_success_remains_unmet(self):
+        case = next(case for case in suite.CASES if case.name == "seq-failure-after-output")
+        self.successful()
+        self.events.write_text(self.events.read_text().replace("cleanup:fixture-root", "child-failure:a\ncleanup:fixture-root"))
+        self.assertEqual(suite.assess(case, self.root, 1, "DEMO_CHILD_FAILURE:a")[:2], ("not_met", "passed"))
+
     def test_comparison_distinguishes_regression_missing_and_changed_contract(self):
         def record(name, state, contract="same"):
             return {"case": name, "requirement_state": state, "requirement_contract": contract}

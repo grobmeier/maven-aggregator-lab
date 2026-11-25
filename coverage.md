@@ -6,7 +6,7 @@ Use `./acceptance-suite.sh show CASE` to inspect a requirement, its evidence, li
 | Group | Cases | Scope |
 |---|---:|---|
 | Ordering | 9 | Builders, bindings, worker counts, standalone projects, and verification |
-| Failure | 3 | Deliberate child failures, aggregate safety, and unresolved cleanup policy |
+| Failure | 4 | Deliberate child failures, aggregate safety, and unresolved cleanup policy |
 | Selection | 6 | Active contributors, root exclusion, and nested group boundaries |
 | Inheritance | 3 | Inherited copies and explicit child declarations |
 | Site | 4 | Hook timing and actual site/Javadoc rendering |

@@ -126,7 +126,7 @@ def configure(ui, lab, selection):
         resolve_source(selection.target, selection.revision)
         detected = shutil.which(selection.bootstrap) or shutil.which("mvn") or ""
         selection.bootstrap = maven_executable(pick_path(ui, "Which Maven should build the source?", detected, lab.parent))
-    selection.scope = ui.choose("Which cases should run?", [("All 25 cases", "all"), ("Smoke set: 3 ordering cases", "smoke"),
+    selection.scope = ui.choose("Which cases should run?", [(f"All {len(CASES)} cases", "all"), ("Smoke set: 3 ordering cases", "smoke"),
                                 ("One group", "group"), ("Select individual cases", "cases")], selection.scope)
     if selection.scope == "group":
         selection.group = ui.choose("Choose a group", [(name, name) for name in GROUPS], selection.group)

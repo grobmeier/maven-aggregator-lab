@@ -84,6 +84,22 @@ class CatalogueTests(unittest.TestCase):
     def test_generated_reference_matches_registered_cases(self):
         self.assertEqual(catalogue.reference_markdown(), (LAB / "acceptance/CASES.md").read_text())
 
+    def test_sequential_failure_after_output_changes_only_builder(self):
+        concurrent = next(case for case in catalogue.CASES if case.name == "failure-after-output")
+        sequential = next(case for case in catalogue.CASES if case.name == "seq-failure-after-output")
+        ignored = {"name", "builder", "purpose", "comparisons", "order"}
+        self.assertEqual({key: value for key, value in asdict(concurrent).items() if key not in ignored},
+                         {key: value for key, value in asdict(sequential).items() if key not in ignored})
+        self.assertEqual(sequential.builder, "singlethreaded")
+        with tempfile.TemporaryDirectory() as directory:
+            inputs = []
+            for case in (concurrent, sequential):
+                root = Path(directory) / case.name
+                build(root, case)
+                inputs.append({str(path.relative_to(root)): path.read_bytes() for path in root.rglob("*") if path.is_file()})
+            self.assertEqual(*inputs)
+        self.assertIn(("failure-after-output", "Builder only"), catalogue.comparisons_for(sequential))
+
 
 class ContractTests(unittest.TestCase):
     def setUp(self):

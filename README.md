@@ -1,6 +1,6 @@
 # Maven Aggregator Acceptance Lab
 
-Run 25 aggregation cases and compare saved results.
+Run 26 aggregation cases and compare saved results.
 Requires Bash, Python 3, JDK 17+, and Maven 4.1.x or 4.2.x.
 
 ## Interactive launcher
